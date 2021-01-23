@@ -1,0 +1,38 @@
+####
+POST http://localhost:4000/users HTTP/1.1
+content-type: application/json
+
+{   "id": 3,
+    "username":"admin",
+    "password":"admin",
+    "email":"alexandre.lecom2@gmail.com",
+    "firstname":"alexandre",
+    "lastname":"",
+    "date_created": "2021-01-18T18:56:20.048Z"
+}
+
+#####
+GET  http://localhost:4000/profile -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImdhdGVzMjMiLCJpYXQiOjE2MTE0MzA5ODcsImV4cCI6MTYxMTQzMTA0N30.l3lhLri2R4W9RX8X530piVmBVCQh4wIYin0Vl8Et35U" HTTP/1.1
+content-type: application/json
+
+#####
+POST http://localhost:4000/auth/login HTTP/1.1
+content-type: application/json
+
+{
+    "username":"gates23",
+    "password":"bragap017"
+}
+
+#####
+DELETE  http://localhost:4000/users/1 HTTP/1.1
+content-type: application/json
+
+####
+POST http://localhost:4000/users/login HTTP/1.1
+content-type: application/json
+
+{
+    "username":"gates23",
+    "password":"bragap017"
+}

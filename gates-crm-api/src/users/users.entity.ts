@@ -1,7 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert, CreateDateColumn } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
-@Entity('Users')
+@Entity('users')
 export class UsersEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -14,12 +15,14 @@ export class UsersEntity {
 
   @BeforeInsert()
   async hashPassword() {
-    this.password = this.password;
+    console.log("ENTITY PASSWORD HASh"+this.password)
+
+    this.password = await bcrypt.hash(this.password, 10);
   }
 
   @Column({
     nullable: false,
-    length: 45,
+    length: 90,
   })
   password: string;
 
@@ -41,8 +44,7 @@ export class UsersEntity {
   })
   date_created: Date;
 
-  @Column({
-    default: true,
-  })
-  active: boolean;
+  async comparePassword(attempt: string): Promise<boolean> {
+    return await bcrypt.compare(attempt, this.password);
+  }
 }

@@ -1,0 +1,16 @@
+<div class="user-container">
+  <mat-card class="user-card">
+    <mat-card-content>
+<!--       <form class="my-form"[formGroup]="loginForm" (ngSubmit)="login()">
+ -->
+      <div *ngFor="let item of results">
+          <li>{{item.username}} </li>
+      </div>
+
+    </mat-card-content>
+
+    <mat-card-actions>
+    </mat-card-actions>
+  </mat-card>
+
+</div>

@@ -1,7 +1,10 @@
 /* eslint-disable prettier/prettier */
-import { IsBoolean, IsDateString, IsString } from 'class-validator';
+import { IsBoolean, IsDateString, IsNumber, IsString } from 'class-validator';
 
 export class UserDTO {
+  @IsNumber()
+  id: number;
+  
   @IsString()
   username: string;
 
@@ -22,9 +25,9 @@ export class UserDTO {
 }
 
 export class UserLoginDTO {
-    @IsString()
-    username: string;
-  
-    @IsString()
-    password: string;
+  @IsString()
+  username: string;
+
+  @IsString()
+  password: string;
 }  

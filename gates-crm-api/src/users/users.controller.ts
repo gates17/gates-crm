@@ -12,22 +12,24 @@ export class UsersController {
 
   @Get()
   async getAllUsers() {
-    const data = await this.usersService.showAll();
-    if (!data) {
-      throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
-    }
     return {
       statusCode: HttpStatus.OK,
-      data: data,
+      data: await this.usersService.showAll(),
     };
   }
 
   @Get(':id')
-  async getUser(@Param('id') id: number) {
+  async getUserId(@Param('id') id: number) {
     const data = await this.usersService.findById(id);
-    if (!data) {
-      throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
-    }
+    return {
+      statusCode: HttpStatus.OK,
+      data: data,
+    };
+  }
+
+  @Get('user/:user')
+  async getUserEmail(@Param('user') user: string) {
+    const data = await this.usersService.findByEmail(user);
     return {
       statusCode: HttpStatus.OK,
       data: data,
@@ -36,21 +38,7 @@ export class UsersController {
 
   @Post()
   @UsePipes(new ValidationPipe())
-  async registerUser(@Body() data: UserDTO) {
-    const today = new Date();
-    this.logger.log(today);
-    this.logger.log(JSON.stringify(data));
-
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'User added successfully',
-      data: await this.usersService.create(data),
-    };
-  }
-
-  @Post()
-  @UsePipes(new ValidationPipe())
-  async loginUser(@Body() data: UserDTO) {
+  async createUser(@Body() data: UserDTO) {
     const today = new Date();
     this.logger.log(today);
     this.logger.log(JSON.stringify(data));
@@ -65,6 +53,7 @@ export class UsersController {
   @UsePipes(new ValidationPipe())
   async updateUser(@Param('id') id: number, @Body() data: Partial<UserDTO>) {
     this.logger.log(JSON.stringify(data));
+
     return {
       statusCode: HttpStatus.OK,
       message: 'User update successfully',
@@ -78,6 +67,32 @@ export class UsersController {
     return {
       statusCode: HttpStatus.OK,
       message: 'User deleted successfully',
+    };
+  }
+
+  @Post('register')
+  @UsePipes(new ValidationPipe())
+  async registerUser(@Body() data: UserDTO) {
+    const today = new Date();
+    this.logger.log(today);
+    this.logger.log(JSON.stringify(data));
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'User registered successfully',
+      data: await this.usersService.create(data),
+    };
+  }
+
+  @Post('login')
+  @UsePipes(new ValidationPipe())
+  async loginUser(@Body() data: UserLoginDTO) {
+    const today = new Date();
+    this.logger.log(today);
+    this.logger.log(JSON.stringify(data));
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'User logged in successfully',
+      data: await this.usersService.login(data),
     };
   }
 }
