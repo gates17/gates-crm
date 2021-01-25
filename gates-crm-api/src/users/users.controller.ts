@@ -1,16 +1,23 @@
 import { UserLoginDTO, UserDTO } from './users.dto';
 // eslint-disable-next-line prettier/prettier
-import { Controller, Get, Post, Patch, Delete, Body, Param, HttpStatus, HttpException, UsePipes, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, HttpStatus, HttpException, UsePipes, Logger, UseGuards } from '@nestjs/common';
 
 import { UsersService } from './users.service';
 import { ValidationPipe } from '../shared/validation.pipe';
+import { Public } from 'src/auth/public.decorator';
+import { UserRole } from 'src/user-role/user-role.decorator';
+import { Role } from 'src/user-role/role.enum';
+import { UserRolesGuard } from 'src/user-role/user-role.guard';
 
 @Controller('users')
 export class UsersController {
   private logger = new Logger('UsersController');
   constructor(private usersService: UsersService) {}
 
+  //@UseGuards(UserrRolesGuard)
   @Get()
+  @UseGuards(UserRolesGuard)
+  @UserRole(Role.Admin)
   async getAllUsers() {
     return {
       statusCode: HttpStatus.OK,
@@ -18,6 +25,8 @@ export class UsersController {
     };
   }
 
+  @UseGuards(UserRolesGuard)
+  @UserRole(Role.Admin, Role.User)
   @Get(':id')
   async getUserId(@Param('id') id: number) {
     const data = await this.usersService.findById(id);

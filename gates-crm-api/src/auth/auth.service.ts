@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { UserLoginDTO, UserDTO } from './../users/users.dto';
@@ -15,10 +15,8 @@ export class AuthService {
   async validateUser(data: UserLoginDTO): Promise<any> {
     Logger.log('user validation' + data, 'AUTHSERVICE');
     const { username, password } = data;
-    //const user = await this.usersService.findByEmail(username);
     const user = await this.usersService.login(data);
     if (user) {
-      // if (user && await user.comparePassword(password) {
       const { password, ...result } = user;
       return result;
     }
@@ -26,7 +24,12 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { username: user.username, sub: user.userId };
+    user.userId = user.id; // o que é o userId
+    const payload = {
+      username: user.username,
+      sub: user.userId,
+      role: user.role_id,
+    };
     const access_token = this.jwtService.sign(payload);
     const expiration = this.jwtService.decode(access_token);
     return {
@@ -34,23 +37,21 @@ export class AuthService {
       expiresIn: expiration,
     };
   }
-}
 
-/* constructor(private usersService: Repository<UsersEntity>) {}
-
-async validateUser(data: UserLoginDTO): Promise<any> {
-  const { username, password } = data;
-  const user = await this.usersService.findOne({
-    where: [
-      {
-        username: username,
-        email: username,
-      },
-    ],
-  });
-  if (user && (await user.comparePassword(password))) {
-    const { password, ...result } = user;
-    return result;
+  async register(user: UserDTO) {
+    const today = new Date();
+    Logger.log(user, 'AUTH REGISTER');
+    const registerUser = await this.usersService.create(user);
+    if (registerUser) {
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'User registered successfully',
+        data: registerUser,
+      };
+    }
+    return {
+      statusCode: HttpStatus.BAD_REQUEST,
+      message: 'User registration failed.',
+    };
   }
-  return null;
-} */
+}

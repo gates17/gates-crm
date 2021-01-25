@@ -1,6 +1,7 @@
 import { Injectable, HttpStatus, HttpException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { UserRoleEntity } from 'src/user-role/user-role.entity';
+import { Repository, getRepository } from 'typeorm';
 import { UserLoginDTO, UserDTO } from './users.dto';
 
 import { UsersEntity } from './users.entity';
@@ -12,15 +13,18 @@ export class UsersService {
   ) {}
 
   async showAll() {
-    const data = await this.usersRepository.find();
+    const data = await this.usersRepository.find({ relations: ['role'] });
     if (!data) {
       throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
     }
-    return await this.usersRepository.find();
+    return data;
   }
 
   async findById(id: number) {
-    const data = await this.usersRepository.findOne({ where: { id: id } });
+    const data = await this.usersRepository.findOne({
+      where: { id: id },
+      relations: ['role'],
+    });
     if (!data) {
       throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
     }
@@ -29,24 +33,26 @@ export class UsersService {
 
   async create(data: UserDTO) {
     const checkuser = await this.usersRepository.findOne({
-      where: {
-        email: data.email,
-      },
+      where: { email: data.email },
+      relations: ['role'],
     });
 
     if (checkuser) {
       throw new HttpException('User already exists', HttpStatus.FOUND);
     }
-    // data.password = await bcrypt.hash(data.password, 10);
     const user = await this.usersRepository.create(data);
+    const role = await getRepository(UserRoleEntity).findOneOrFail({
+      where: { id: 2 },
+    });
+    user.role = role;
     await this.usersRepository.save(user);
-    // Logger.log('CREATING ', 'USERSERVICE');
     return user;
   }
 
-  async findByEmail(email: string): Promise<UserLoginDTO> {
+  async findByEmail(email: string) {
     return await this.usersRepository.findOne({
       where: [{ email: email }, { username: email }],
+      relations: ['role'],
     });
   }
 

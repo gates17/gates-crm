@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert, CreateDateColumn, JoinColumn, ManyToOne } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { UserRoleEntity } from 'src/user-role/user-role.entity';
 
 @Entity('users')
 export class UsersEntity {
@@ -44,7 +45,11 @@ export class UsersEntity {
   })
   date_created: Date;
 
+  @ManyToOne(() => UserRoleEntity, role => role.id)
+  role: UserRoleEntity;
+
   async comparePassword(attempt: string): Promise<boolean> {
     return await bcrypt.compare(attempt, this.password);
   }
+  
 }
